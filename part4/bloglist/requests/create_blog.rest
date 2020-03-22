@@ -1,11 +1,10 @@
 post http://localhost:3003/api/blogs
 Content-Type: application/json
-Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InVvcDEyMyIsImlkIjoiNWU0MmY4ODk1OWI1ODgzNzY0NWQ1ZTY3IiwiaWF0IjoxNTgxNjE2MTM3fQ.NJnOinab6_klwQsZKfr1w3qlD0s7UALF6hxEkNiDP-Q
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InVvcDEyMyIsImlkIjoiNWU0MmY4ODk1OWI1ODgzNzY0NWQ1ZTY3IiwiaWF0IjoxNTg0ODg3NjUzfQ.EvrhifT-z25TUITL8OIhqTiPPmm2iL5sCfhXA8GpDF4
 
 {
-    "title":"hahahahaha to uop123",
+    "title":"!!!!!!",
     "author":"Heather He",
     "url":"wwww.google.com",
-    "likes":5,
-    "userId": "5e42f88959b58837645d5e67"
+    "likes":12
 }
