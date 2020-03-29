@@ -6,27 +6,20 @@ import loginService from './services/login';
 import BlogForm from './components/BlogForm';
 import LoginForm from './components/LoginForm';
 import Togglable from './components/Togglable';
-import { useField } from './hooks';
 
 function App() {
   const [blogs, setBlogs] = useState([]);
-  const { reset: resetUsername, ...username } = useField('text'); //nice solution
-  const { reset: resetPassword, ...password } = useField('password'); //nice solution
   const [user, setUser] = useState(null);
   const [errorMessage, setErrorMessage] = useState(null);
   const [successfulMessage, setSuccessfulMessage] = useState(null);
-  const { reset: resetNewTitle, ...newTitle } = useField('text');
-  const { reset: resetNewAuthor, ...newAuthor } = useField('text');
-  const { reset: resetNewUrl, ...newUrl } = useField('url');
 
   const blogFormRef = React.createRef();
 
   useEffect(() => {
     blogService.getAll().then(blogs => {
-      blogs.sort((a, b) => a.likes - b.likes);
       setBlogs(blogs);
     });
-  }, [blogs]);
+  }, []); //这里不能加上[blogs],否则页面会一直请求/api/blogs，无限循环下去
 
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem('loggedBlogappUser');
@@ -37,19 +30,13 @@ function App() {
     }
   }, []); //important
 
-  const handleLogin = async event => {
-    event.preventDefault();
+  const login = async (username, password) => {
     try {
-      const user = await loginService.login({
-        username: username.value,
-        password: password.value
-      });
+      const user = await loginService.login({ username, password });
 
       window.localStorage.setItem('loggedBlogappUser', JSON.stringify(user));
       blogService.setToken(user.token);
       setUser(user);
-      resetUsername();
-      resetPassword();
     } catch (exception) {
       setErrorMessage('Wrong username or password');
       setTimeout(() => {
@@ -57,28 +44,56 @@ function App() {
       }, 5000);
     }
   };
-  const addBlog = event => {
-    event.preventDefault();
-    blogFormRef.current.toggleVisibility();
-    const blogObject = {
-      title: newTitle.value,
-      author: newAuthor.value,
-      url: newUrl.value
+  const addBlog = async blog => {
+    try {
+      const newBlog = await blogService.create(blog);
+      blogFormRef.current.toggleVisibility();
+      setBlogs(blogs.concat(newBlog));
+      setSuccessfulMessage(
+        `a new blog ${newBlog.title} by ${newBlog.author} added!`
+      );
+      setTimeout(() => {
+        setSuccessfulMessage(null);
+      }, 5000);
+    } catch (exception) {
+      console.log(exception);
+    }
+  };
+
+  const increaseLikes = async id => {
+    const blogToLike = blogs.find(b => b.id === id);
+    const likedBlog = {
+      ...blogToLike,
+      likes: blogToLike.likes + 1,
+      user: blogToLike.user.id
     };
 
-    blogService.create(blogObject).then(data => {
-      setBlogs(blogs.concat(data));
-      resetNewTitle();
-      resetNewAuthor();
-      resetNewUrl();
-    });
-
-    setSuccessfulMessage(
-      `a new blog ${newTitle.value} by ${newAuthor.value} added`
+    await blogService.update(likedBlog);
+    setBlogs(
+      blogs.map(blog =>
+        blog.id === id ? { ...blogToLike, likes: blogToLike.likes + 1 } : blog
+      )
     );
-    setTimeout(() => {
-      setSuccessfulMessage(null);
-    }, 5000);
+    //because we add [blogs] into useEffect, so we dont setBlogs again, same applies to create and delete----this is wrong, reason given on top.
+  };
+
+  const deleteBlog = async id => {
+    const blogToRemove = blogs.find(b => b.id === id);
+    if (
+      window.confirm(
+        `remove blog ${blogToRemove.title} by ${blogToRemove.author}`
+      )
+    ) {
+      try {
+        await blogService.remove(id);
+        setBlogs(blogs.filter(b => b.id !== id));
+      } catch (exception) {
+        setErrorMessage('Delete blog failed');
+        setTimeout(() => {
+          setErrorMessage(null);
+        }, 5000);
+      }
+    }
   };
 
   if (user === null) {
@@ -86,11 +101,7 @@ function App() {
       <div>
         <h2>log in to application</h2>
         <Notification errorMessage={errorMessage} />
-        <LoginForm
-          handleLogin={handleLogin}
-          username={username}
-          password={password}
-        />
+        <LoginForm login={login} />
       </div>
     );
   }
@@ -114,23 +125,19 @@ function App() {
         </button>
       </div>
       <Togglable buttonLabel="new blog" ref={blogFormRef}>
-        <BlogForm
-          addBlog={addBlog}
-          newTitle={newTitle}
-          newAuthor={newAuthor}
-          newUrl={newUrl}
-        />
+        <BlogForm addBlog={addBlog} />
       </Togglable>
-      {blogs.map(blog => (
-        <Blog
-          key={blog.id}
-          blog={blog}
-          user={user}
-          blogs={blogs}
-          setBlogs={setBlogs}
-          setErrorMessage={setErrorMessage}
-        />
-      ))}
+      {blogs
+        .sort((a, b) => b.likes - a.likes)
+        .map(blog => (
+          <Blog
+            key={blog.id}
+            blog={blog}
+            user={user}
+            increaseLikes={increaseLikes}
+            deleteBlog={deleteBlog}
+          />
+        ))}
     </div>
   );
 }

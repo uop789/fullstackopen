@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import blogService from '../services/blogs';
-const Blog = ({ blog, blogs, user, setBlogs, setErrorMessage }) => {
+import PropTypes from 'prop-types';
+
+const Blog = ({ blog, user, increaseLikes, deleteBlog }) => {
   const blogStyle = {
     paddingTop: 10,
     paddingLeft: 2,
@@ -9,73 +10,47 @@ const Blog = ({ blog, blogs, user, setBlogs, setErrorMessage }) => {
     marginBottom: 5
   };
   const [displayMore, setDispayMore] = useState(false);
-  const [likes, setLikes] = useState(blog.likes);
-
-  const handleOnClick = () => {
-    setDispayMore(!displayMore);
-  };
-
-  const increaseLikes = event => {
-    event.stopPropagation();
-    const blogObject = {
-      user: blog.user,
-      likes: blog.likes + 1,
-      author: blog.author,
-      title: blog.title,
-      url: blog.url
-    };
-
-    blogService.update(blog.id, blogObject).then(data => {
-      setLikes(data.likes);
-
-      const newBlogs = blogs.map(blog =>
-        blog.id === data.id ? { ...blog, likes: data.likes } : blog
-      );
-
-      setBlogs(newBlogs);
-    });
-  };
-
-  const deleteBlog = async () => {
-    if (window.confirm(`remove blog ${blog.title} by ${blog.author}`)) {
-      try {
-        await blogService.remove(blog.id);
-      } catch (exception) {
-        setErrorMessage('Delete blog failed');
-        setTimeout(() => {
-          setErrorMessage(null);
-        }, 5000);
-      }
-    }
-  };
 
   if (displayMore) {
     return (
-      <div style={blogStyle} className="moreInfo">
-        <div onClick={handleOnClick}>
+      <div style={blogStyle} className="moreInfo, blog">
+        <div>
           <p>
-            {blog.title} {blog.author}
+            {blog.title} by {blog.author}{' '}
+            <button onClick={() => setDispayMore(!displayMore)}>hide</button>
           </p>
           <a href={blog.url}>{blog.url}</a>
           <div>
-            {likes} likes <button onClick={increaseLikes}>like</button>
+            {blog.likes} likes{' '}
+            <button onClick={() => increaseLikes(blog.id)}>like</button>
           </div>
           <p>added by {blog.user.name}</p>
-          {user.name === blog.user.name ? (
-            <button onClick={deleteBlog}>remove</button>
+          {user.username === blog.user.username ? (
+            <button onClick={() => deleteBlog(blog.id)}>remove</button>
           ) : null}
         </div>
       </div>
     );
   } else {
     return (
-      <div style={blogStyle} className="defaultInfo">
-        <div onClick={handleOnClick}>
-          {blog.title} {blog.author}
+      <div style={blogStyle} className="defaultInfo, blog">
+        <div>
+          {blog.title} by {blog.author}{' '}
+          <button onClick={() => setDispayMore(!displayMore)}>view</button>
         </div>
       </div>
     );
   }
+};
+
+Blog.propTypes = {
+  blog: PropTypes.shape({
+    title: PropTypes.string.isRequired,
+    author: PropTypes.string.isRequired,
+    url: PropTypes.string.isRequired
+  }).isRequired,
+  increaseLikes: PropTypes.func.isRequired,
+  deleteBlog: PropTypes.func.isRequired
 };
 
 export default Blog;
