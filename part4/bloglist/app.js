@@ -9,17 +9,18 @@ const usersRouter = require('./controllers/users');
 const loginRouter = require('./controllers/login');
 const middleware = require('./utils/middleware');
 
+mongoose.set('useFindAndModify', false);
 console.log('connecting to', config.MONGODB_URI);
 
 mongoose
   .connect(config.MONGODB_URI, {
     useNewUrlParser: true,
-    useUnifiedTopology: true
+    useUnifiedTopology: true,
   })
   .then(() => {
     console.log('connected to MongoDB');
   })
-  .catch(error => {
+  .catch((error) => {
     console.log('error connection to MongoDB:', error.message);
   });
 
