@@ -1,0 +1,10 @@
+post http://localhost:3003/api/blogs
+Content-Type: application/json
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InVvcDEyMyIsImlkIjoiNWU0MmY4ODk1OWI1ODgzNzY0NWQ1ZTY3IiwiaWF0IjoxNTg0ODg3NjUzfQ.EvrhifT-z25TUITL8OIhqTiPPmm2iL5sCfhXA8GpDF4
+
+{
+    "title":"!!!!!!",
+    "author":"Heather He",
+    "url":"wwww.google.com",
+    "likes":12
+}
