@@ -36,8 +36,9 @@ const typeDefs = gql`
     id: ID!
   }
 
-  type Token {
+  type TokenAndCurrentUser {
     value: String!
+    user: User!
   }
 
   type Book {
@@ -73,7 +74,7 @@ const typeDefs = gql`
     ): Book
     editAuthor(name: String!, setBornTo: Int!): Author
     createUser(username: String!, favoriteGenre: String!): User
-    login(username: String!, password: String!): Token
+    login(username: String!, password: String!): TokenAndCurrentUser
   }
 `;
 
@@ -96,8 +97,8 @@ const resolvers = {
     allBooks: (root, args) => {
       return Book.find({}).populate('author');
     },
-    me: (root, args, context) => {
-      return context.currentUser;
+    me: (root, args, { currentUser }) => {
+      return currentUser;
     },
   },
   Author: {
@@ -162,6 +163,7 @@ const resolvers = {
     },
     login: async (root, args) => {
       const user = await User.findOne({ username: args.username });
+      console.log(user);
       if (!user || args.password !== 'password') {
         throw new UserInputError('wrong credentials');
       }
@@ -170,8 +172,8 @@ const resolvers = {
         username: user.username,
         id: user._id,
       };
-
-      return { value: jwt.sign(userForToken, JWT_SECRET) };
+      let value = jwt.sign(userForToken, JWT_SECRET);
+      return { value, user };
     },
   },
 };

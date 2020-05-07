@@ -1,20 +1,31 @@
 import React, { useState, useEffect } from 'react';
 import { useMutation } from '@apollo/client';
-import { LOGIN } from '../queries';
+import { LOGIN, ME } from '../queries';
 
 const LoginForm = ({ show, setToken, setPage }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
-  const [login, result] = useMutation(LOGIN);
+  const [login, result] = useMutation(LOGIN, {
+    onError: (error) => {
+      console.log(error.graphQLErrors[0].message);
+    },
+    update: (cache, response) => {
+      cache.writeQuery({
+        query: ME,
+        data: { me: response.data.login.user },
+      });
+    },
+  });
 
   useEffect(() => {
     if (result.data) {
       const token = result.data.login.value;
       setToken(token);
+      setPage('authors');
       localStorage.setItem('booklibrary-user-token', token);
     }
-  }, [result.data]); // eslint-disable-line
+  }, [result.data, setToken, setPage]);
 
   if (!show) {
     return null;
@@ -22,8 +33,9 @@ const LoginForm = ({ show, setToken, setPage }) => {
 
   const submit = async (event) => {
     event.preventDefault();
-    login({ variables: { username, password } });
-    setPage('authors');
+    login({
+      variables: { username, password },
+    });
     setUsername('');
     setPassword('');
   };
@@ -32,7 +44,7 @@ const LoginForm = ({ show, setToken, setPage }) => {
     <div>
       <form onSubmit={submit}>
         <div>
-          name
+          username
           <input
             value={username}
             onChange={({ target }) => setUsername(target.value)}
