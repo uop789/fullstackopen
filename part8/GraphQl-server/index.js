@@ -9,19 +9,18 @@ const mongoose = require('mongoose');
 const Book = require('./models/book');
 const Author = require('./models/author');
 const User = require('./models/user');
+const config = require('./utils/config');
 
 mongoose.set('useFindAndModify', false);
 mongoose.set('useCreateIndex', true);
 
-const MONGODB_URI =
-  'mongodb+srv://uop789:hz888190@cluster0-oo2ba.mongodb.net/graphql-booklibrary?retryWrites=true&w=majority';
-
-const JWT_SECRET = 'NEED_HERE_A_SECRET_KEY';
-
-console.log('connecting to', MONGODB_URI);
+console.log('connecting to', config.MONGODB_URI);
 
 mongoose
-  .connect(MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+  .connect(config.MONGODB_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
   .then(() => {
     console.log('connected to MongoDB');
   })
@@ -164,7 +163,6 @@ const resolvers = {
     },
     login: async (root, args) => {
       const user = await User.findOne({ username: args.username });
-      console.log(user);
       if (!user || args.password !== 'password') {
         throw new UserInputError('wrong credentials');
       }
@@ -173,7 +171,7 @@ const resolvers = {
         username: user.username,
         id: user._id,
       };
-      let value = jwt.sign(userForToken, JWT_SECRET);
+      let value = jwt.sign(userForToken, config.JWT_SECRET);
       return { value, user };
     },
   },
@@ -185,7 +183,7 @@ const server = new ApolloServer({
   context: async ({ req }) => {
     const auth = req ? req.headers.authorization : null;
     if (auth && auth.toLowerCase().startsWith('bearer ')) {
-      const decodedToken = jwt.verify(auth.substring(7), JWT_SECRET);
+      const decodedToken = jwt.verify(auth.substring(7), config.JWT_SECRET);
       const currentUser = await User.findById(decodedToken.id);
       return { currentUser };
     }
