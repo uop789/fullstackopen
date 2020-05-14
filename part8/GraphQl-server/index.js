@@ -30,6 +30,7 @@ mongoose
     console.log('error connection to MongoDB:', error.message);
   });
 
+let books;
 const typeDefs = gql`
   type User {
     username: String!
@@ -101,6 +102,7 @@ const resolvers = {
       return Book.find(query).populate('author');
     },
     allAuthors: async (root, args) => {
+      books = await Book.find({});
       return Author.find({});
     },
     me: (root, args, { currentUser }) => {
@@ -109,8 +111,7 @@ const resolvers = {
   },
   Author: {
     bookCount: async (root) => {
-      let result = await Book.find({ author: root.id });
-      return result.length;
+      return books.filter((b) => String(b.author) === String(root._id)).length;
     },
   },
   Mutation: {
