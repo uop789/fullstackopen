@@ -9,7 +9,7 @@ import { useStateValue, updatePatient } from '../state';
 import { assertNever } from '../utils';
 
 const PatientDeatilPage: React.FC = () => {
-  const [{ patients }, dispatch] = useStateValue();
+  const [{ patients, diagnosis }, dispatch] = useStateValue();
   const { id } = useParams<{ id: string }>();
   const patient = patients[id];
 
@@ -34,7 +34,6 @@ const PatientDeatilPage: React.FC = () => {
   }
 
   const { gender, dateOfBirth, occupation, name, ssn, entries } = patient;
-  console.log(patient);
 
   const iconType = (gender: Gender) => {
     switch (gender) {
@@ -71,9 +70,18 @@ const PatientDeatilPage: React.FC = () => {
                 </p>
                 {entry.diagnosisCodes && (
                   <ul>
-                    {entry.diagnosisCodes.map((code) => (
-                      <li key={code}>{code}</li>
-                    ))}
+                    {entry.diagnosisCodes.map((code) => {
+                      const details = diagnosis.find(
+                        (diagnosis) => diagnosis.code === code
+                      );
+                      return (
+                        details && (
+                          <li key={code}>
+                            {code}: {details.name}
+                          </li>
+                        )
+                      );
+                    })}
                   </ul>
                 )}
               </div>
