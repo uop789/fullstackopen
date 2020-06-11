@@ -3,13 +3,16 @@ import patients from '../../data/patients';
 import { Patient, PublicPatient, NewPatientEntry } from '../types';
 
 const getPublicPatients = (): PublicPatient[] => {
-  return patients.map(({ id, name, dateOfBirth, gender, occupation }) => ({
-    id,
-    name,
-    dateOfBirth,
-    gender,
-    occupation,
-  }));
+  return patients.map(
+    ({ id, name, dateOfBirth, gender, occupation, entries }) => ({
+      id,
+      name,
+      dateOfBirth,
+      gender,
+      occupation,
+      entries,
+    })
+  );
 };
 
 const addPatient = (patient: NewPatientEntry): Patient => {
