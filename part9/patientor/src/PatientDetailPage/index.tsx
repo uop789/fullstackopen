@@ -7,9 +7,10 @@ import { Patient, Gender } from '../types';
 import { apiBaseUrl } from '../constants';
 import { useStateValue, updatePatient } from '../state';
 import { assertNever } from '../utils';
+import EntryDetails from '../components/Entry';
 
 const PatientDeatilPage: React.FC = () => {
-  const [{ patients, diagnosis }, dispatch] = useStateValue();
+  const [{ patients }, dispatch] = useStateValue();
   const { id } = useParams<{ id: string }>();
   const patient = patients[id];
 
@@ -64,27 +65,7 @@ const PatientDeatilPage: React.FC = () => {
           <h3>entries</h3>
           {entries.length > 0 ? (
             entries.map((entry) => (
-              <div key={entry.id}>
-                <p>
-                  {entry.date} {entry.description}
-                </p>
-                {entry.diagnosisCodes && (
-                  <ul>
-                    {entry.diagnosisCodes.map((code) => {
-                      const details = diagnosis.find(
-                        (diagnosis) => diagnosis.code === code
-                      );
-                      return (
-                        details && (
-                          <li key={code}>
-                            {code}: {details.name}
-                          </li>
-                        )
-                      );
-                    })}
-                  </ul>
-                )}
-              </div>
+              <EntryDetails key={entry.id} entry={entry} />
             ))
           ) : (
             <div>No entries yet</div>
