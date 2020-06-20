@@ -1,6 +1,8 @@
 import { v4 as uuidv4 } from 'uuid';
-import patients from '../../data/patients';
+import patientsData from '../../data/patients';
 import { Patient, PublicPatient, NewPatient, Entry } from '../types';
+
+let patients = [...patientsData];
 
 const getPublicPatients = (): PublicPatient[] => {
   return patients.map(
@@ -31,8 +33,11 @@ const findById = (id: string): Patient | undefined => {
 };
 
 const addEntry = (patient: Patient, newEntry: Entry): Patient => {
-  const updatedPatient = { ...patient, entries: patient.entries.concat(newEntry) };
-  patients.map((patient) =>
+  const updatedPatient = {
+    ...patient,
+    entries: patient.entries.concat(newEntry),
+  };
+  patients = patients.map((patient) =>
     patient.id === updatedPatient.id ? updatedPatient : patient
   );
 

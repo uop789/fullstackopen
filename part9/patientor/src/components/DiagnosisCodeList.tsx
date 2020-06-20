@@ -10,7 +10,7 @@ const DiagnosisCodeList: React.FC<DiagnosisCodeListProps> = ({
 }) => {
   const [{ diagnosis }] = useStateValue();
 
-  return (
+  return diagnosesCodes.length > 0 ? (
     <>
       <h4>DiagnosesCodes</h4>
       <ul>
@@ -28,7 +28,7 @@ const DiagnosisCodeList: React.FC<DiagnosisCodeListProps> = ({
         })}
       </ul>
     </>
-  );
+  ) : null;
 };
 
 export default DiagnosisCodeList;
