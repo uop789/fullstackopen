@@ -3,13 +3,12 @@ import axios from 'axios';
 import { useParams } from 'react-router-dom';
 import { Container, Icon, Divider, Button } from 'semantic-ui-react';
 
-import { Patient, Gender } from '../types';
+import { Patient, Gender, NewEntryType } from '../types';
 import { apiBaseUrl } from '../constants';
 import { useStateValue, updatePatient } from '../state';
 import { assertNever } from '../utils';
 import EntryDetails from '../components/Entry';
 import AddEntryModal from '../AddEntryModal';
-import { EntryFormValues } from '../AddEntryModal/AddEntryForm';
 
 const PatientDeatilPage: React.FC = () => {
   const [{ patients }, dispatch] = useStateValue();
@@ -26,13 +25,12 @@ const PatientDeatilPage: React.FC = () => {
     setError(undefined);
   };
 
-  const submitNewEntry = async (values: EntryFormValues) => {
+  const submitNewEntry = async (values: NewEntryType) => {
     try {
       const { data: updatedPatient } = await axios.post<Patient>(
         `${apiBaseUrl}/api/patients/${id}/entries`,
         values
       );
-      console.log(updatedPatient);
       dispatch(updatePatient(updatedPatient));
       closeModal();
     } catch (e) {
