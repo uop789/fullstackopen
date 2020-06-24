@@ -11,6 +11,11 @@ import {
   DiagnosisSelection,
 } from '../components/FormField';
 import { useStateValue } from '../state';
+import {
+  healthCheckSchema,
+  hospitalSchema,
+  occupationalHealthcareSchema,
+} from '../validationSchema';
 
 interface Props {
   onSubmit: (values: NewEntryType) => void;
@@ -127,6 +132,19 @@ export const AddEntryForm: React.FC<Props> = ({ onSubmit, onCancel }) => {
     }
   };
 
+  const selectValidationSchema = () => {
+    switch (entryType) {
+      case 'HealthCheck':
+        return healthCheckSchema;
+      case 'Hospital':
+        return hospitalSchema;
+      case 'OccupationalHealthcare':
+        return occupationalHealthcareSchema;
+      default:
+        return assertNever(entryType);
+    }
+  };
+
   return (
     <div>
       <select
@@ -143,20 +161,7 @@ export const AddEntryForm: React.FC<Props> = ({ onSubmit, onCancel }) => {
         <Formik
           initialValues={initialValues()}
           onSubmit={onSubmit}
-          validate={(values) => {
-            const requiredError = 'Field is required';
-            const errors: { [field: string]: string } = {};
-            if (!values.description) {
-              errors.description = requiredError;
-            }
-            if (!values.date) {
-              errors.date = requiredError;
-            }
-            if (!values.specialist) {
-              errors.specialist = requiredError;
-            }
-            return errors;
-          }}
+          validationSchema={selectValidationSchema()}
         >
           {({ isValid, dirty, setFieldValue, setFieldTouched }) => {
             return (
