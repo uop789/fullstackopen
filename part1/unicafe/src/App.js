@@ -15,8 +15,6 @@ const StatisticLine = ({ text, value }) => {
 
 const Statistics = ({ good, neutral, bad }) => {
 	const total = good + neutral + bad;
-	const average = total === 0 ? 0 : (good - bad) / total;
-	const positive = total === 0 ? 0 : `${(good / total) * 100}%`;
 
 	if (total === 0) {
 		return (
@@ -36,8 +34,8 @@ const Statistics = ({ good, neutral, bad }) => {
 					<StatisticLine text="neutral" value={neutral} />
 					<StatisticLine text="bad" value={bad} />
 					<StatisticLine text="all" value={total} />
-					<StatisticLine text="average" value={average} />
-					<StatisticLine text="positive" value={positive} />
+					<StatisticLine text="average" value={(good - bad) / total} />
+					<StatisticLine text="positive" value={`${(good / total) * 100}%`} />
 				</tbody>
 			</table>
 		</>
@@ -50,31 +48,12 @@ const App = () => {
 	const [neutral, setNeutral] = useState(0);
 	const [bad, setBad] = useState(0);
 
-	const setToValue = (type, newValue) => {
-		switch (type) {
-			case 'good':
-				setGood(newValue);
-				break;
-			case 'neutral':
-				setNeutral(newValue);
-				break;
-			case 'bad':
-				setBad(newValue);
-				break;
-			default:
-				break;
-		}
-	};
-
 	return (
 		<div>
 			<h2>give feedback</h2>
-			<Button handleClick={() => setToValue('good', good + 1)} text="good" />
-			<Button
-				handleClick={() => setToValue('neutral', neutral + 1)}
-				text="neutral"
-			/>
-			<Button handleClick={() => setToValue('bad', bad + 1)} text="bad" />
+			<Button handleClick={() => setGood(good + 1)} text="good" />
+			<Button handleClick={() => setNeutral(neutral + 1)} text="neutral" />
+			<Button handleClick={() => setBad(bad + 1)} text="bad" />
 			<Statistics good={good} neutral={neutral} bad={bad} />
 		</div>
 	);
