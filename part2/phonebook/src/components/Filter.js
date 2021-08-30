@@ -1,12 +1,11 @@
 import React from 'react';
 
-const Filter = props => {
-  return (
-    <p>
-      {`filter shown with `}
-      <input value={props.searchName} onChange={props.handleSearchName} />
-    </p>
-  );
+const Filter = ({ value, onChange }) => {
+	return (
+		<div>
+			filter shown with <input value={value} onChange={onChange} />
+		</div>
+	);
 };
 
 export default Filter;
