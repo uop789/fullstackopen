@@ -50,6 +50,8 @@ const App = () => {
 							persons.map((p) => (p.id !== person.id ? p : returnedPerson))
 						);
 						setSuccessfulMessgae(`Number of ${returnedPerson.name} changed`);
+						setNewName('');
+						setNewNumber('');
 						setTimeout(() => {
 							setSuccessfulMessgae(null);
 						}, 5000);
@@ -62,9 +64,6 @@ const App = () => {
 							setErrorMessage(null);
 						}, 5000);
 					});
-			} else {
-				setNewName('');
-				setNewNumber('');
 			}
 		}
 	};
