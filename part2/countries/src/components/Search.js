@@ -7,9 +7,7 @@ const Search = ({ query, setQuery }) => {
 
 	return (
 		<div>
-			<div>
-				find countries <input value={query} onChange={handleSearch} />
-			</div>
+			find countries <input value={query} onChange={handleSearch} />
 		</div>
 	);
 };
