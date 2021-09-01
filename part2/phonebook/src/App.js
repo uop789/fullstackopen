@@ -47,14 +47,24 @@ const App = () => {
 			);
 			if (ok) {
 				const toUpdate = { ...existing, number: newNumber };
-				personService.update(existing.id, toUpdate).then((returnedPerson) => {
-					setPersons(
-						persons.map((p) => (p.id !== existing.id ? p : returnedPerson))
-					);
-					notifyWith(`Changed number of  ${existing.name}`);
-					setNewName('');
-					setNewNumber('');
-				});
+				personService
+					.update(existing.id, toUpdate)
+					.then((returnedPerson) => {
+						setPersons(
+							persons.map((p) => (p.id !== existing.id ? p : returnedPerson))
+						);
+						notifyWith(`Changed number of  ${existing.name}`);
+						setNewName('');
+						setNewNumber('');
+					})
+					.catch((error) => {
+						console.log(error);
+						setPersons(persons.filter((p) => p.id !== existing.id));
+						notifyWith(
+							`Information of ${existing.name} has already been removed from server`,
+							'error'
+						);
+					});
 			}
 		} else {
 			const personObject = {
