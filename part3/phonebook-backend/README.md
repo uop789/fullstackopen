@@ -1,1 +1,2 @@
-https://agile-thicket-66259.herokuapp.com/api/persons
+https://secret-thicket-10475.herokuapp.com/
+https://secret-thicket-10475.herokuapp.com/api/persons
