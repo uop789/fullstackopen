@@ -1,7 +1,9 @@
+if (process.env.NODE_ENV !== 'production') {
+    require('dotenv').config();
+}
 const express = require('express');
 const morgan = require('morgan');
 const cors = require('cors');
-require('dotenv').config();
 const Person = require('./models/person');
 
 const app = express();
@@ -32,7 +34,7 @@ app.get('/info', (request, response) => {
 
 app.get('/api/persons', (request, response) => {
     Person.find({}).then((persons) => {
-        response.json(persons);
+        response.json(persons.map((p) => p.toJSON()));
     });
 });
 
@@ -40,7 +42,7 @@ app.get('/api/persons/:id', (request, response, next) => {
     Person.findById(request.params.id)
         .then((person) => {
             if (person) {
-                response.json(person);
+                response.json(person.toJSON());
             } else {
                 response.status(404).end();
             }
@@ -65,7 +67,7 @@ app.post('/api/persons', (request, response, next) => {
     person
         .save()
         .then((savedPerson) => {
-            response.json(savedPerson);
+            response.json(savedPerson.toJSON());
         })
         .catch((error) => next(error));
 });
@@ -73,9 +75,15 @@ app.post('/api/persons', (request, response, next) => {
 app.put('/api/persons/:id', (request, response, next) => {
     const { name, number } = request.body;
 
-    Person.findByIdAndUpdate(request.params.id, { name, number }, { new: true })
+    Person.findOneAndUpdate(
+        { _id: request.params.id },
+        { name, number },
+        // upsert: true --- if updated on a deleteed one, simply add it
+        // runValidators: true --- enable mongoose validators On update operations
+        { new: true, upsert: true, runValidators: true, context: 'query' }
+    )
         .then((updatedPerson) => {
-            response.json(updatedPerson);
+            response.json(updatedPerson.toJSON());
         })
         .catch((error) => next(error));
 });
